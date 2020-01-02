@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Amazon.CDK" Version="1.11.0-devpreview" />
+    <PackageReference Include="Amazon.CDK.AWS.ApiGateway" Version="1.11.0-devpreview" />
+    <PackageReference Include="Amazon.CDK.AWS.DynamoDB" Version="1.11.0-devpreview" />
+    <PackageReference Include="Amazon.CDK.AWS.Lambda" Version="1.11.0-devpreview" />
+    <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="1.2.0" />
+    <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.6.0" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.101.72" />
+  </ItemGroup>
+
+</Project>
