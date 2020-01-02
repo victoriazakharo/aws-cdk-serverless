@@ -1,0 +1,229 @@
+Resources:
+  BlogTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: Id
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: Id
+          AttributeType: S
+      ProvisionedThroughput:
+        ReadCapacityUnits: 3
+        WriteCapacityUnits: 3
+  GetBlogs:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          victoria-test
+        S3Key:
+          v1.0.0/GetBlogs.zip
+      Handler: GetBlogs::GetBlogs.Function::GetBlogs
+      Role: arn:aws:iam::312226949769:role/IDTJawsLambdaFullAccessRole
+      Runtime: dotnetcore2.1
+      Description: Function to get blogs
+      Environment:
+        Variables:
+          BlogTable:
+            Ref: BlogTable
+          DOTNET_SHARED_STORE: /opt/dotnetcore/store/
+      Layers:
+        - arn:aws:lambda:us-east-1:312226949769:layer:BlogLayer:1
+      MemorySize: 256
+      Timeout: 30
+  AddBlog:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          victoria-test
+        S3Key:
+          v1.0.0/AddBlog.zip
+      Handler: AddBlog::AddBlog.Function::AddBlog
+      Role: arn:aws:iam::312226949769:role/IDTJawsLambdaFullAccessRole
+      Runtime: dotnetcore2.1
+      Description: Function to add a blog
+      Environment:
+        Variables:
+          BlogTable:
+            Ref: BlogTable
+          DOTNET_SHARED_STORE: /opt/dotnetcore/store/
+      Layers:
+        - arn:aws:lambda:us-east-1:312226949769:layer:BlogLayer:1
+      MemorySize: 256
+      Timeout: 30
+  BlogsRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: Blog Service Manual
+  BlogsRestApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId:
+        Ref: BlogsRestApi
+    DependsOn:
+      - BlogsRestApiGET
+      - BlogsRestApiPOST
+  BlogsRestApiDeploymentStageprod:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId:
+        Ref: BlogsRestApi
+      DeploymentId:
+        Ref: BlogsRestApiDeployment
+      StageName: prod
+  GetBlogsLambdaPermissionForProdStage:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - GetBlogs
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: BlogsRestApi
+            - /
+            - Ref: BlogsRestApiDeploymentStageprod
+            - /GET/
+  GetBlogsLambdaPermissionForTestInvoke:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - GetBlogs
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: BlogsRestApi
+            - /test-invoke-stage/GET/
+  BlogsRestApiGET:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: GET
+      ResourceId:
+        Fn::GetAtt:
+          - BlogsRestApi
+          - RootResourceId
+      RestApiId:
+        Ref: BlogsRestApi
+      AuthorizationType: NONE
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - ":apigateway:"
+              - Ref: AWS::Region
+              - :lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - GetBlogs
+                  - Arn
+              - /invocations
+  AddBlogLambdaPermissionForProdStage:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - AddBlog
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: BlogsRestApi
+            - /
+            - Ref: BlogsRestApiDeploymentStageprod
+            - /POST/
+  AddBlogLambdaPermissionForTestInvoke:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - AddBlog
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: BlogsRestApi
+            - /test-invoke-stage/POST/
+  BlogsRestApiPOST:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: POST
+      ResourceId:
+        Fn::GetAtt:
+          - BlogsRestApi
+          - RootResourceId
+      RestApiId:
+        Ref: BlogsRestApi
+      AuthorizationType: NONE
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - ":apigateway:"
+              - Ref: AWS::Region
+              - :lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - AddBlog
+                  - Arn
+              - /invocations
+Outputs:
+  BlogsRestApiEndpoint:
+    Value:
+      Fn::Join:
+        - ""
+        - - https://
+          - Ref: BlogsRestApi
+          - .execute-api.
+          - Ref: AWS::Region
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: BlogsRestApiDeploymentStageprod
+          - /
