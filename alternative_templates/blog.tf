@@ -50,7 +50,7 @@
    environment {
     variables = {
       DOTNET_SHARED_STORE = var.dotnet_shared_store
-	  BlogTable = aws_dynamodb_table.blog-table.name
+      BlogTable = aws_dynamodb_table.blog-table.name
     }
   }
   layers = [var.blog_layer_arn]
@@ -69,7 +69,7 @@
    environment {
     variables = {
       DOTNET_SHARED_STORE = var.dotnet_shared_store
-	  BlogTable = aws_dynamodb_table.blog-table.name
+      BlogTable = aws_dynamodb_table.blog-table.name
     }
   }
   layers = [var.blog_layer_arn]
@@ -85,6 +85,7 @@
    http_method   = "POST"
    authorization = "NONE"
  } 
+ 
  resource "aws_api_gateway_integration" "lambda_post" {
    rest_api_id = aws_api_gateway_rest_api.blog_api.id
    resource_id = aws_api_gateway_method.proxy_post.resource_id
@@ -101,6 +102,7 @@
    http_method   = "GET"
    authorization = "NONE"
  }
+ 
  resource "aws_api_gateway_integration" "lambda_get" {
    rest_api_id = aws_api_gateway_rest_api.blog_api.id
    resource_id = aws_api_gateway_method.proxy_get.resource_id
