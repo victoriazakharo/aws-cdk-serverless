@@ -1,4 +1,4 @@
-This example uses lambda to serve-up widgets.
+This example uses AWS CDK to build blog service same as in AWS Serverless template project for .NET: https://github.com/aws/aws-lambda-dotnet/tree/master/Blueprints/BlueprintDefinitions/Msbuild-NETCore_2_1/DynamoDBBlogAPI
 
 ## Build
 
@@ -15,20 +15,7 @@ This will install the necessary CDK, then this example's dependencies, and then 
 
 Run `cdk deploy`. This will deploy / redeploy your Stack to your AWS Account.
 
-After the deployment you will see the API's URL, which represents the url you can then use.
-
-## Test the service
-```bash
-#List all widgets
-curl https://<api gateway domain/prod/
-
-#Add a few widgets
-curl -X POST https://<api gateway domain>/prod/123
-curl -X POST https://<api gateway domain>/prod/456
-curl -X POST https://<api gateway domain>/prod/abc
-
-#List all widgets (should return array)
-curl https://<api gateway domain/prod/
+After the deployment you will see the API's URL, which represents the url you can then use to add and list blogs.
 
 ## Synthesize Cloudformation Template
 
