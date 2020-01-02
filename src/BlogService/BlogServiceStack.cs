@@ -54,7 +54,6 @@ namespace BlogService
             });
             var getMethod = api.Root.AddMethod("GET", new LambdaIntegration(getBlogs, null), null);
             var postMethod = api.Root.AddMethod("POST", new LambdaIntegration(addBlog, null), null);
-            var blog = api.Root.AddResource("{id}", null);
         }
     }
 }
