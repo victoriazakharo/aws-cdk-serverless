@@ -26,7 +26,7 @@
    region = "us-east-1"
  }
  
- resource "aws_dynamodb_table" "blog-table" {
+ resource "aws_dynamodb_table" "blog_table" {
   name           = "BlogTable"
   read_capacity  = 3
   write_capacity = 3
@@ -50,7 +50,7 @@
    environment {
     variables = {
       DOTNET_SHARED_STORE = var.dotnet_shared_store
-      BlogTable = aws_dynamodb_table.blog-table.name
+      BlogTable = aws_dynamodb_table.blog_table.name
     }
   }
   layers = [var.blog_layer_arn]
@@ -69,7 +69,7 @@
    environment {
     variables = {
       DOTNET_SHARED_STORE = var.dotnet_shared_store
-      BlogTable = aws_dynamodb_table.blog-table.name
+      BlogTable = aws_dynamodb_table.blog_table.name
     }
   }
   layers = [var.blog_layer_arn]
